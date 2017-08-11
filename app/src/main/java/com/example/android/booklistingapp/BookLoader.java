@@ -3,7 +3,7 @@ package com.example.android.booklistingapp;
 import java.util.List;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
+import android.content.AsyncTaskLoader;
 
 /**
  * Created by thodzic on 8/2/17.

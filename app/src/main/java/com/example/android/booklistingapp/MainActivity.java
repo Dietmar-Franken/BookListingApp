@@ -11,15 +11,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.id.input;
+
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Book>> {
 
     public static final String LOG_TAG = MainActivity.class.getName();
-    final static String REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=android";
+    String userInput = "";
+    String REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=";
 
     private BookAdapter mAdapter;
 
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 ListView bookListView = (ListView) findViewById(R.id.list);
 
                 // Create a new adapter that takes an empty list of books as imput
-                mAdapter = new BookAdapter(this,new ArrayList<Book>());
+                mAdapter = new BookAdapter(MainActivity.this,new ArrayList<Book>());
 
                 //Set the adapter on the ListView
                 //so the list can be populated in the user interface
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 //Initiate the loader.  Pass in the int ID constant defined above and pass in null for
                 //the bundle.  Pass in this activity for the LoaderCAllbacks parameter (which is valid
                 //because this activity implements the LoaderCallbacks interface).
-                loaderManager.initLoader(BOOK_LOADER_ID, null, this);
+                loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
             }
         });
     }
@@ -80,11 +84,19 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     @Override
     public Loader<List<Book>> onCreateLoader(int id, Bundle args) {
         //Create a new loader for the given URL
-        return new BookLoader(this, REQUEST_URL);
+        EditText search_bar = (EditText) findViewById(R.id.search_bar);
+        userInput = search_bar.getText().toString();
+        String search = REQUEST_URL+ userInput;
+        return new BookLoader(this, search);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
+        EditText search_bar = (EditText) findViewById(R.id.search_bar);
+        search_bar.setVisibility(View.GONE);
+
+        Button submitButton = (Button) findViewById(R.id.search_button);
+        submitButton.setVisibility(View.GONE);
         //Clear the adapter of previous book data
         mAdapter.clear();
         //If there is a valid list of books, then add them to the adapter's dataset.  This will

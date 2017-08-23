@@ -37,19 +37,22 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
 
+        //Find a reference to the ListView in the layout
+        ListView bookListView = (ListView) findViewById(R.id.list);
+
+        // Create a new adapter that takes an empty list of books as imput
+        mAdapter = new BookAdapter(MainActivity.this,new ArrayList<Book>());
+
+        //Set the adapter on the ListView
+        //so the list can be populated in the user interface
+        bookListView.setAdapter(mAdapter);
+
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
+
         final Button submitButton = (Button) findViewById(R.id.search_button);
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v){
-
-                //Find a reference to the ListView in the layout
-                ListView bookListView = (ListView) findViewById(R.id.list);
-
-                // Create a new adapter that takes an empty list of books as imput
-                mAdapter = new BookAdapter(MainActivity.this,new ArrayList<Book>());
-
-                //Set the adapter on the ListView
-                //so the list can be populated in the user interface
-                bookListView.setAdapter(mAdapter);
 
                 LoaderManager loaderManager = getLoaderManager();
 

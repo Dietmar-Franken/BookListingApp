@@ -53,11 +53,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
                 LoaderManager loaderManager = getLoaderManager();
 
-
                 //Initiate the loader.  Pass in the int ID constant defined above and pass in null for
                 //the bundle.  Pass in this activity for the LoaderCAllbacks parameter (which is valid
                 //because this activity implements the LoaderCallbacks interface).
-                loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
+                loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
 
             }
         });
@@ -92,6 +91,5 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoaderReset(Loader<List<Book>> loader) {
         //Loader reset, so we can clear out our exisiting data
         mAdapter.clear();
-        mAdapter.notifyDataSetChanged();
     }
 }

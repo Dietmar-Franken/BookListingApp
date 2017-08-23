@@ -7,8 +7,12 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/list">
+        android:layout_height="450dp"
+        android:id="@+id/list"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/search_button">
     </ListView>
 
     <!-- Empty view is only visible when the list has no items. -->
@@ -18,22 +22,17 @@
         android:gravity="center_horizontal"
         android:text=""
         android:id="@+id/search_bar"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="47dp"
-        android:layout_marginStart="47dp"
-        android:layout_marginBottom="173dp" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/search_bar"
-        android:layout_toRightOf="@+id/search_bar"
-        android:layout_toEndOf="@+id/search_bar"
-        android:layout_marginLeft="25dp"
-        android:layout_marginStart="25dp"
         android:text="Search"
-        android:id="@+id/search_button"/>
+        android:id="@+id/search_button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

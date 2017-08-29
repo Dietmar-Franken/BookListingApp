@@ -54,6 +54,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v){
 
+                InputMethodManager inputManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+
                 LoaderManager loaderManager = getLoaderManager();
 
                 //Initiate the loader.  Pass in the int ID constant defined above and pass in null for
@@ -76,11 +82,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
-        InputMethodManager inputManager = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
         //Clear the adapter of previous book data
         mAdapter.clear();
         //If there is a valid list of books, then add them to the adapter's dataset.  This will
@@ -94,17 +95,5 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoaderReset(Loader<List<Book>> loader) {
         //Loader reset, so we can clear out our exisiting data
         mAdapter.clear();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.getParcelableArrayList("list", new ArrayList<Book>);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        savedInstanceState.getParcelableArrayList("book_list");
     }
 }

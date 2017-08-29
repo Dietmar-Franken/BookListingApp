@@ -95,4 +95,16 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         //Loader reset, so we can clear out our exisiting data
         mAdapter.clear();
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.getParcelableArrayList("list", new ArrayList<Book>);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.getParcelableArrayList("book_list");
+    }
 }

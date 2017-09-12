@@ -14,22 +14,23 @@ public class Book {
 
     /**
      * Construcsts a new Book object
-     * @param author is the author of the book
+     *
+     * @param author    is the author of the book
      * @param bookTitle is the title of the book
      */
 
-    public Book(String author, String bookTitle){
+    public Book(String author, String bookTitle) {
         mAuthor = author;
         mTitle = bookTitle;
     }
 
     //Returns author of the book
-    public String getAuthor(){
+    public String getAuthor() {
         return mAuthor;
     }
 
     //Returns title of the book
-    public String getTitle(){
+    public String getTitle() {
         return mTitle;
     }
 }

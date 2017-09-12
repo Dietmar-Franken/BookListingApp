@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
@@ -26,6 +27,10 @@ import static com.example.android.booklistingapp.MainActivity.LOG_TAG;
  */
 
 public final class BookQuery {
+
+    //Best to declare numbers like this instead of using "magic numbers"
+    public static final int SET_READ_TIMEOUT = 10000;
+    public static final int SET_CONNECTION_TIMEOUT = 15000;
 
     /**
      * Query the USGS dataset and return a list of {@link Book} objects.
@@ -42,14 +47,10 @@ public final class BookQuery {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }
 
-        // Extract relevant fields from the JSON response and create a list of {@link Earthquake}s
-        List<Book> earthquakes = extractBooksFromJson(jsonResponse);
-
         // Return the list of {@link Earthquake}s
-        return earthquakes;
+        return extractBooksFromJson(jsonResponse);
     }
 
-    //Return a list of Book objects that has been built up from parsing the given JSON response.
     private static List<Book> extractBooksFromJson(String bookJSON){
         //if the JSON string is empty or null then return early.
         if (TextUtils.isEmpty(bookJSON)) {
@@ -60,7 +61,7 @@ public final class BookQuery {
         List<Book> books = new ArrayList<>();
 
         //Try to Parse the JSON response string.  If there is a problemwith the way the JSON is
-        //formatted, a JSONException exception objct will be thrown.  Catch the exception so the app
+        //formatted, a JSONException exception object will be thrown.  Catch the exception so the app
         //doesn't crash, and print the error message to the logs.
 
         try {
@@ -81,13 +82,19 @@ public final class BookQuery {
 
                 String title = volumeInfo.getString("title");
 
-                String author = volumeInfo.getString("authors");
+                String author;
 
-                // Create a new {@link Earthquake} object with the magnitude, location, time,
-                // and url from the JSON response.
+                //When parsing JSON, use .has to check if JSON key exists.
+                if (volumeInfo.has("authors")){
+                    author = volumeInfo.getString("authors");
+                } else author = "Author N/A";
+
+
+                // Create a new {@link Book} object with the title and author from the JSON response.
+
                 Book book = new Book(title,author);
-
                 books.add(book);
+
             }
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
@@ -128,8 +135,8 @@ public final class BookQuery {
         InputStream inputStream = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(SET_READ_TIMEOUT /* milliseconds */);
+            urlConnection.setConnectTimeout(SET_CONNECTION_TIMEOUT /* milliseconds */);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 

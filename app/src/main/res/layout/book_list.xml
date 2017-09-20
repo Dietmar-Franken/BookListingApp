@@ -16,14 +16,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/search_bar"
-            android:text="Enter Search Term Above" />
+            android:text="@string/search_term" />
 
         <TextView
             android:id="@+id/nothing_to_display_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="There is nothing to display." />
+            android:text="@string/nothing_to_display" />
 
         <ListView
             android:id="@+id/list"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:text="Search" />
+            android:text="@string/search" />
 
         <!-- Empty view is only visible when the list has no items. -->
         <TextView

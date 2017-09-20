@@ -6,6 +6,8 @@ import android.content.Loader;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,9 +21,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.string.no;
-
-
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Book>> {
 
     public static final String LOG_TAG = MainActivity.class.getName();
@@ -33,8 +32,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     private static final int BOOK_LOADER_ID = 1;
 
+    private static final String STATE_ITEMS = "items";
+    private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
 
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         //Set the adapter on the ListView
         //so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
+
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
 
         final Button submitButton = (Button) findViewById(R.id.search_button);
         submitButton.setOnClickListener(new View.OnClickListener() {
@@ -124,5 +129,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoaderReset(Loader<List<Book>> loader) {
         //Loader reset, so we can clear out our exisiting data
         mAdapter.clear();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putStringArrayList(LIST_INSTANCE_STATE, ArrayList<Book>);
     }
 }

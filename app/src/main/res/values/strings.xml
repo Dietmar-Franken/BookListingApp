@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">BookListingApp</string>
     <string name="app_label">Book Listing App</string>
-    <string name="search_hint">Enter Search Term</string>
+    <string name="search_term">Enter Search Term Above</string>
+    <string name="nothing_to_display">There is nothing new to display.</string>
+    <string name="search">Search</string>
 </resources>

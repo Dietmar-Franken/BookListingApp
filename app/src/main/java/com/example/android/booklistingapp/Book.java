@@ -1,10 +1,13 @@
 package com.example.android.booklistingapp;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by thodzic on 7/28/17.
  */
 
-public class Book {
+public class Book implements Parcelable {
 
     //Author of the book
     private String mAuthor;
@@ -33,4 +36,33 @@ public class Book {
     public String getTitle() {
         return mTitle;
     }
+
+    protected Book(Parcel in) {
+        mAuthor = in.readString();
+        mTitle = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mAuthor);
+        dest.writeString(mTitle);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>() {
+        @Override
+        public Book createFromParcel(Parcel in) {
+            return new Book(in);
+        }
+
+        @Override
+        public Book[] newArray(int size) {
+            return new Book[size];
+        }
+    };
 }

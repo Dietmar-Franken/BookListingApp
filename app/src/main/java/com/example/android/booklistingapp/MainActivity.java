@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
 
@@ -50,9 +50,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         // Create a new adapter that takes an empty list of books as imput
         mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
 
+        Parcelable state = bookListView.onSaveInstanceState();
+
         //Set the adapter on the ListView
         //so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
+
+        bookListView.onRestoreInstanceState(state);
 
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
@@ -134,6 +138,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putStringArrayList(LIST_INSTANCE_STATE, ArrayList<Book>);
+        outState.putParcelable(LIST_INSTANCE_STATE, (Parcelable) mAdapter);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.getParcelable(LIST_INSTANCE_STATE);
     }
 }

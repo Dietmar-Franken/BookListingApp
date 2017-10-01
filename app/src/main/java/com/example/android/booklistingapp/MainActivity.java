@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -35,28 +36,23 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private static final String STATE_ITEMS = "items";
     private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
 
+    //Find a reference to the ListView in the layout
+    ListView bookListView;
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
-
-        //Checks to see if there is an internet connection
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-        //Find a reference to the ListView in the layout
-        ListView bookListView = (ListView) findViewById(R.id.list);
 
         // Create a new adapter that takes an empty list of books as imput
         mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
 
-        Parcelable state = bookListView.onSaveInstanceState();
+        bookListView = (ListView) findViewById(R.id.list);
 
         //Set the adapter on the ListView
         //so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
-
-        bookListView.onRestoreInstanceState(state);
 
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
@@ -136,14 +132,15 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        outState.putParcelable(LIST_INSTANCE_STATE, (Parcelable) mAdapter);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(LIST_INSTANCE_STATE, bookListView.getFirstVisiblePosition());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        savedInstanceState.getParcelable(LIST_INSTANCE_STATE);
+        int position = savedInstanceState.getInt(LIST_INSTANCE_STATE);
+        bookListView.setSelection(position);
     }
 }

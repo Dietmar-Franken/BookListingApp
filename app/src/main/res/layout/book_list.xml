@@ -39,7 +39,9 @@
             android:layout_width="135dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="" />
+            android:text="" >
+            <requestFocus />
+        </EditText>
 
         <Button
             android:id="@+id/search_button"

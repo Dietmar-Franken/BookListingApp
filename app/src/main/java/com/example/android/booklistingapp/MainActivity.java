@@ -39,11 +39,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     //Find a reference to the ListView in the layout
     ListView bookListView;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
+
+        EditText searchBarText = (EditText) findViewById(R.id.search_bar);
+        searchBarText.requestFocus();
 
         // Create a new adapter that takes an empty list of books as imput
         mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());

@@ -6,17 +6,20 @@ import android.content.Loader;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.app.SearchManager;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 
 import java.util.ArrayList;
@@ -27,13 +30,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public static final String LOG_TAG = MainActivity.class.getName();
     String userInput = "";
     String REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=";
-    private TextView mEmptyStateTextView;
 
     private BookAdapter mAdapter;
 
     private static final int BOOK_LOADER_ID = 1;
 
-    private static final String STATE_ITEMS = "items";
     private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
 
     //Find a reference to the ListView in the layout
@@ -144,5 +145,32 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         super.onRestoreInstanceState(savedInstanceState);
         int position = savedInstanceState.getInt(LIST_INSTANCE_STATE);
         bookListView.setSelection(position);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+
+        // Setting the listener on the SearchView
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                LoaderManager loaderManager = getLoaderManager();
+                loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
+                loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return true;
     }
 }

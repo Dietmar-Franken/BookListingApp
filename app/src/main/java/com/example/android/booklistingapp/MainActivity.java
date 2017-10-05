@@ -6,6 +6,7 @@ import android.content.Loader;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,9 +18,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.app.SearchManager;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 
 
 import java.util.ArrayList;
@@ -98,13 +96,24 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         });
     }
 
+
     @Override
     public Loader<List<Book>> onCreateLoader(int id, Bundle args) {
         //Create a new loader for the given URL
+        //Use URI builder to build the URL string because it helps minimize security risks and
+        //allows us to include and encode special characters easily on your URLs.
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority("www.googleapis.com")
+                .appendPath("books")
+                .appendPath("v1")
+                .appendPath("volumes")
+                .appendQueryParameter("q", userInput);
+        String myUrl = builder.build().toString();
         EditText search_bar = (EditText) findViewById(R.id.search_bar);
-        userInput = search_bar.getText().toString();
-        String search = REQUEST_URL + userInput;
-        return new BookLoader(this, search);
+        SearchView query = (SearchView) findViewById(R.id.action_search);
+        userInput = query.getQuery().toString();
+        return new BookLoader(this, myUrl);
     }
 
     @Override
@@ -159,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
                 LoaderManager loaderManager = getLoaderManager();
                 loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
                 loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);

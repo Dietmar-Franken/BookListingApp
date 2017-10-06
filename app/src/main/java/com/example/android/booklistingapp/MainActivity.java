@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     public static final String LOG_TAG = MainActivity.class.getName();
     String userInput = "";
-    String REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=";
 
     private BookAdapter mAdapter;
 

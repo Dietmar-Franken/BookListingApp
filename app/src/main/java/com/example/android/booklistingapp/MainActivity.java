@@ -7,14 +7,12 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -30,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     private BookAdapter mAdapter;
 
+    private  String mQuery = "";
+
     private static final int BOOK_LOADER_ID = 1;
 
     private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
@@ -41,9 +41,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_list);
-
-        EditText searchBarText = (EditText) findViewById(R.id.search_bar);
-        searchBarText.requestFocus();
 
         // Create a new adapter that takes an empty list of books as imput
         mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
@@ -57,21 +54,73 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
 
-        final Button submitButton = (Button) findViewById(R.id.search_button);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        // Save the ListView state (= includes scroll position) as a Parceble
+        Parcelable state = bookListView.onSaveInstanceState();
 
-                //Once the search button is clicked, hide the search instructions
-                TextView search_instructions = (TextView) findViewById(R.id.search_instruction);
-                search_instructions.setVisibility(View.GONE);
+        // e.g. set new items
+        bookListView.setAdapter(mAdapter);
 
-                //Once the user hits search, the keyboard disappears
-                InputMethodManager inputManager = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
+        // Restore previous state (including selected item index and scroll position)
+        bookListView.onRestoreInstanceState(state);
 
-                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+    }
 
+
+    @Override
+    public Loader<List<Book>> onCreateLoader(int id, Bundle args) {
+        //Create a new loader for the given URL
+        //Use URI builder to build the URL string because it helps minimize security risks and
+        //allows us to include and encode special characters easily on your URLs.
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority("www.googleapis.com")
+                .appendPath("books")
+                .appendPath("v1")
+                .appendPath("volumes")
+                .appendQueryParameter("q", mQuery);
+        String myUrl = builder.build().toString();
+        return new BookLoader(this, myUrl);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
+        //Clear the adapter of previous book data
+        mAdapter.clear();
+        //If there is a valid list of books, then add them to the adapter's dataset.  This will
+        //trigger the ListView to update.
+
+        if (books == null) {
+            TextView nothing_to_display_text = (TextView) findViewById(R.id.nothing_to_display_text);
+            nothing_to_display_text.setVisibility(View.VISIBLE);
+        }
+        if (books != null && !books.isEmpty()) {
+            mAdapter.addAll(books);
+            TextView nothing_to_display_text = (TextView) findViewById(R.id.nothing_to_display_text);
+            nothing_to_display_text.setVisibility(View.GONE);
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Book>> loader) {
+        //Loader reset, so we can clear out our exisiting data
+        mAdapter.clear();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchMenuItem.getActionView();
+
+        // Setting the listener on the SearchView
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                mQuery = query;
                 //Check if there is an active internet connection
                 ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -91,86 +140,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                     nothingNewToDisplay.setVisibility(View.GONE);
                 }
 
-            }
-        });
-    }
-
-
-    @Override
-    public Loader<List<Book>> onCreateLoader(int id, Bundle args) {
-        //Create a new loader for the given URL
-        //Use URI builder to build the URL string because it helps minimize security risks and
-        //allows us to include and encode special characters easily on your URLs.
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority("www.googleapis.com")
-                .appendPath("books")
-                .appendPath("v1")
-                .appendPath("volumes")
-                .appendQueryParameter("q", userInput);
-        String myUrl = builder.build().toString();
-        EditText search_bar = (EditText) findViewById(R.id.search_bar);
-        SearchView query = (SearchView) findViewById(R.id.action_search);
-        userInput = query.getQuery().toString();
-        return new BookLoader(this, myUrl);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
-        //Clear the adapter of previous book data
-        mAdapter.clear();
-        //If there is a valid list of books, then add them to the adapter's dataset.  This will
-        //trigger the ListView to update.
-
-        if (books == null) {
-            TextView nothing_to_display_text = (TextView) findViewById(R.id.nothing_to_display_text);
-            nothing_to_display_text.setVisibility(View.VISIBLE);
-        }
-        if (books != null && !books.isEmpty()) {
-            mAdapter.addAll(books);
-            TextView search_instructions = (TextView) findViewById(R.id.search_instruction);
-            search_instructions.setVisibility(View.GONE);
-            TextView nothing_to_display_text = (TextView) findViewById(R.id.nothing_to_display_text);
-            nothing_to_display_text.setVisibility(View.GONE);
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Book>> loader) {
-        //Loader reset, so we can clear out our exisiting data
-        mAdapter.clear();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(LIST_INSTANCE_STATE, bookListView.getFirstVisiblePosition());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        int position = savedInstanceState.getInt(LIST_INSTANCE_STATE);
-        bookListView.setSelection(position);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.options_menu, menu);
-
-        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchMenuItem.getActionView();
-
-        // Setting the listener on the SearchView
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                LoaderManager loaderManager = getLoaderManager();
-                loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
-                loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
+                searchView.clearFocus();
                 return true;
             }
 

@@ -80,18 +80,20 @@ public final class BookQuery {
                 // key called "volumeInfo", which represents a list of all properties for that book.
                 JSONObject volumeInfo = currentBook.getJSONObject("volumeInfo");
 
-                String title = volumeInfo.getString("title");
-
-                String author;
+                //When parsing JSON, it is good to check if the JSON key exists.
+                String title;
+                if (volumeInfo.has("title")){
+                    title = volumeInfo.getString("title");
+                } else title = "Title N/A";
 
                 //When parsing JSON, use .has to check if JSON key exists.
+                String author;
                 if (volumeInfo.has("authors")){
                     author = volumeInfo.getString("authors");
                 } else author = "Author N/A";
 
 
                 // Create a new {@link Book} object with the title and author from the JSON response.
-
                 Book book = new Book(title,author);
                 books.add(book);
 

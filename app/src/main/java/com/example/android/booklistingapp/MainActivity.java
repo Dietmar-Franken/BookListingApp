@@ -1,15 +1,15 @@
 package com.example.android.booklistingapp;
 
 import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Loader;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,25 +17,19 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Book>> {
 
-    public static final String LOG_TAG = MainActivity.class.getName();
-    String userInput = "";
-
-    private BookAdapter mAdapter;
-
-    private  String mQuery = "";
-
-    private static final int BOOK_LOADER_ID = 1;
-
-    private static final String LIST_INSTANCE_STATE = "Saved Scroll Position";
-
+    //Give our book loader an id of 1 and set as a public global variable.
+    public static final int BOOK_LOADER_ID = 1;
     //Find a reference to the ListView in the layout
     ListView bookListView;
+    //Set the adapter to a non public, non static global variable.
+    private BookAdapter mAdapter;
+    //Set the query term to a non public, non static global variable.
+    private String mQuery = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,14 +45,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         //so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
 
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
-
         // Save the ListView state (= includes scroll position) as a Parceble
         Parcelable state = bookListView.onSaveInstanceState();
 
-        // e.g. set new items
-        bookListView.setAdapter(mAdapter);
+        //Initialize the loader
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
 
         // Restore previous state (including selected item index and scroll position)
         bookListView.onRestoreInstanceState(state);
@@ -128,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 //Initiate the loader.  Pass in the int ID constant defined above and pass in null for
                 //the bundle.  Pass in this activity for the LoaderCAllbacks parameter (which is valid
                 //because this activity implements the LoaderCallbacks interface).
-                if (netInfo != null && netInfo.isConnected()){
+                if (netInfo != null && netInfo.isConnected()) {
                     LoaderManager loaderManager = getLoaderManager();
                     loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
                     loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
